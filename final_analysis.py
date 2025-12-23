@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from scipy.stats import spearmanr
 from sklearn.metrics import average_precision_score, auc
 
-# load data and compute metrics for multiple experiments
+# ================= 🔧 修改这里：加入了第三组 SuperGlue =================
 EXPERIMENTS = [
     {
         "name": "CosPlace + SP-LightGlue",
@@ -19,8 +19,16 @@ EXPERIMENTS = [
         "log_dir": r"D:\AML\Visual-Place-Recognition-Project\logs\log_dir\2025-12-19_12-27-49",
         "inliers_folder": "preds_superpoint-lg",
         "color": "orange"
+    },
+    {
+        # 👇 新增的 SuperGlue 实验
+        "name": "CosPlace + SuperGlue",
+        "log_dir": r"D:\AML\Visual-Place-Recognition-Project\logs\log_dir\2025-12-18_12-51-25", # 依然用 CosPlace 的日志目录
+        "inliers_folder": "preds_superglue",  # 指向刚才新生成的文件夹
+        "color": "green"
     }
 ]
+# ======================================================================
 
 def load_data(log_dir, inliers_folder_name):
     z_path = os.path.join(log_dir, "z_data.torch")
@@ -112,13 +120,14 @@ def main():
     # Plot Baseline (Random)
     plt.plot([0, 1], [0, 1], 'k--', alpha=0.3, label='Random Guessing')
     
-    plt.title("Uncertainty Estimation: Sparsification Curves\n(Compare CosPlace vs NetVLAD)")
+    # Update Title for 3 lines
+    plt.title("Uncertainty Estimation: Sparsification Curves\n(Compare Method & Matcher)")
     plt.xlabel("Retention Rate (Keep Top X% Confident Queries)")
     plt.ylabel("Error Rate in Retained Queries")
     plt.legend()
     plt.grid(True, alpha=0.3)
     
-    save_path = "final_uncertainty_comparison.png"
+    save_path = "final_uncertainty_comparison_3lines.png"
     plt.savefig(save_path)
     print(f"\n✅ Plot saved to {save_path}")
     plt.show()
