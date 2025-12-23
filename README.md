@@ -57,3 +57,38 @@ CosPlace Data: logs/log_dir/2025-12-18_12-51-25
 NetVLAD Data: logs/log_dir/2025-12-19_12-27-49
 
 Next Step: Please integrate the table and the plot into the final report document.
+
+
+
+---
+
+## 🔍 Uncertainty Estimation (Section 6.2)
+
+This module implements a probabilistic uncertainty estimation mechanism for Visual Place Recognition. Instead of relying solely on the similarity score from the VPR model (e.g., CosPlace), we use **Geometric Verification** as a proxy for confidence.
+
+### 🛠 Methodology
+
+We treat the uncertainty estimation as a binary classification problem solvable via **Logistic Regression**:
+1.  **Retrieval:** The VPR model retrieves the top candidate.
+2.  **Matching:** We apply **SuperPoint + LightGlue** to match the query with the retrieved image.
+3.  **Feature:** The number of geometrically verified inliers is used as the input feature ($x$).
+4.  **Prediction:** A Logistic Regression model predicts the probability of correctness ($P(y=1|x)$).
+
+### 🧪 Experiment Design: Cross-Domain Robustness
+
+To ensure the robustness of our uncertainty estimator, we designed a challenging **Cross-Domain** experiment:
+
+* **Training Set (The "Teacher"):** **SVOX (Sun vs. Night)**
+    * We trained the model on a difficult split where queries are taken during the day and matched against a database at night.
+    * *Reasoning:* This forces the model to learn a conservative decision boundary, as even correct matches in extreme lighting changes yield fewer inliers.
+* **Testing Set (The "Student"):** **SF-XS (San Francisco)**
+    * The trained model was directly evaluated on the SF-XS dataset without fine-tuning.
+    * *Goal:* To validate the generalization capability of the estimator across different cities and environments.
+
+### 📊 Results
+
+Run the following script to reproduce the training and evaluation process:
+
+```bash
+python universal_lr.py
+```
