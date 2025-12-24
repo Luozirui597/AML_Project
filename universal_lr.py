@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score
 
-# ================= 🔧 配置区域 (修改这里即可) =================
+# ================= 🔧 Configuration Area =================
 
-# 1. 训练集 (Teacher) -> SVOX (21:01:31)
+# 1. Training Set (Teacher) -> SVOX (Sun vs Night)
+# Path from your run at 21:01:31
 TRAIN_LOG_DIR = r"D:\AML\Visual-Place-Recognition-Project\logs\2025-12-23_21-01-31" 
 TRAIN_FOLDER = "preds_superpoint-lg"
 
-# 2. 测试集 (Student) -> SF-XS (21:04:37)
+# 2. Test Set (Student) -> SF-XS (Day)
+# Path from your run at 21:04:37
 TEST_LOG_DIR = r"D:\AML\Visual-Place-Recognition-Project\logs\2025-12-23_21-04-37" 
 TEST_FOLDER = "preds_superpoint-lg"
 
@@ -19,52 +21,56 @@ TEST_FOLDER = "preds_superpoint-lg"
 
 def get_data(log_dir, folder_name):
     """
-    通用数据提取函数：
-    从 Log 文件夹中提取 (连线数量, 是否正确)
+    Generic Data Extraction Function:
+    Extracts (Number of Inliers, Correctness Label) from the Log folder.
     """
-    print(f"📂 正在读取: {log_dir} ...")
+    print(f"📂 Loading: {log_dir} ...")
     
-    # 1. 检查文件是否存在
+    # 1. Check if files exist
     z_path = os.path.join(log_dir, "z_data.torch")
     preds_path = os.path.join(log_dir, folder_name)
     
     if not os.path.exists(z_path):
-        print(f"❌ 错误: 找不到 z_data.torch！请检查路径。")
+        print(f"❌ Error: z_data.torch not found! Please check the path.")
         return None, None
     if not os.path.exists(preds_path):
-        print(f"❌ 错误: 找不到匹配文件夹 {folder_name}！请先运行 match_queries_preds.py。")
+        print(f"❌ Error: Matcher folder {folder_name} not found! Please run match_queries_preds.py first.")
         return None, None
 
-    # 2. 加载数据
+    # 2. Load data
     z_data = torch.load(z_path, weights_only=False)
+    # Sort files numerically to ensure alignment
     files = sorted([f for f in os.listdir(preds_path) if f.endswith(".torch")], 
                    key=lambda x: int(''.join(filter(str.isdigit, x))))
     
     X_inliers = []
     y_labels = []
     
+    # Limit loop to the smaller count (in case processing was interrupted)
     limit = min(len(z_data['predictions']), len(files))
     
     for i in range(limit):
-        # --- 获取 Label (0/1) ---
+        # --- Get Label (0/1) ---
         top_pred = z_data['predictions'][i][0]
         if isinstance(top_pred, torch.Tensor): top_pred = top_pred.item()
         
         true_matches = z_data['positives_per_query'][i]
         if isinstance(true_matches, torch.Tensor): true_matches = true_matches.tolist()
         
+        # Label is 1 if the prediction is in the ground truth set, else 0
         is_correct = 1 if top_pred in true_matches else 0
         y_labels.append(is_correct)
         
-        # --- 获取 Feature (Inliers) ---
+        # --- Get Feature (Inliers) ---
         data = torch.load(os.path.join(preds_path, files[i]), weights_only=False)
         max_inliers = 0
-        # 兼容不同的存储格式
+        
+        # Handle different storage formats (list of dicts vs list of tensors)
         if isinstance(data, list) and len(data) > 0:
             if isinstance(data[0], dict):
                 counts = [x['num_inliers'] for x in data]
             else:
-                counts = [x.item() for x in data] # 如果直接是 tensor
+                counts = [x.item() for x in data] # If it is a tensor directly
             max_inliers = max(counts)
             
         X_inliers.append(max_inliers)
@@ -72,50 +78,50 @@ def get_data(log_dir, folder_name):
     return np.array(X_inliers).reshape(-1, 1), np.array(y_labels)
 
 def main():
-    # --- 1. 准备数据 ---
-    print("--- 正在准备数据 ---")
+    # --- 1. Prepare Data ---
+    print("--- Preparing Data ---")
     X_train, y_train = get_data(TRAIN_LOG_DIR, TRAIN_FOLDER)
     X_test, y_test = get_data(TEST_LOG_DIR, TEST_FOLDER)
     
     if X_train is None or X_test is None:
-        print("程序终止：数据加载失败。")
+        print("Terminating: Data loading failed.")
         return
 
-    print(f"✅ 训练集 (SVOX Sun-Night): {len(y_train)} 个样本 (正样本率: {y_train.mean():.1%})")
-    print(f"✅ 测试集 (SF-XS): {len(y_test)} 个样本")
+    print(f"✅ Training Set (SVOX Sun-Night): {len(y_train)} samples (Positive Rate: {y_train.mean():.1%})")
+    print(f"✅ Test Set (SF-XS): {len(y_test)} samples")
 
-    # --- 2. 训练逻辑回归 ---
-    print("\n🧠 正在训练逻辑回归 (Logistic Regression)...")
+    # --- 2. Train Logistic Regression ---
+    print("\n🧠 Training Logistic Regression...")
     clf = LogisticRegression()
     clf.fit(X_train, y_train)
     
-    # 获取学到的参数
+    # Get learned parameters
     coef = clf.coef_[0][0]
     intercept = clf.intercept_[0]
-    print(f"💡 模型学到的公式: Probability = Sigmoid({coef:.3f} * Inliers + {intercept:.3f})")
+    print(f"💡 Learned Formula: Probability = Sigmoid({coef:.3f} * Inliers + {intercept:.3f})")
 
-    # --- 3. 预测与评估 ---
+    # --- 3. Prediction & Evaluation ---
     probs_test = clf.predict_proba(X_test)[:, 1]
     
-    # 计算分数
-    score_raw = average_precision_score(y_test, X_test)       # 原始连线数
-    score_learned = average_precision_score(y_test, probs_test) # 预测概率
+    # Calculate scores
+    score_raw = average_precision_score(y_test, X_test)       # Baseline: Raw inlier count
+    score_learned = average_precision_score(y_test, probs_test) # Proposed: Probabilistic score
     
     print("\n" + "="*40)
-    print(f"📊 最终结果 (AUPRC)")
-    print(f"1. Baseline (仅数连线): {score_raw:.4f}")
-    print(f"2. Proposed (逻辑回归): {score_learned:.4f}")
+    print(f"📊 Final Results (AUPRC)")
+    print(f"1. Baseline (Raw Inliers): {score_raw:.4f}")
+    print(f"2. Proposed (Logistic Reg): {score_learned:.4f}")
     print("="*40)
 
-    # --- 4. 可视化 (PDF要求的曲线图) ---
+    # --- 4. Visualization (S-Curve required for the report) ---
     plt.figure(figsize=(10, 6))
     
-    # 画出 SVOX 的 S 形曲线
+    # Plot the learned S-Curve (from SVOX)
     x_range = np.linspace(0, 150, 300).reshape(-1, 1)
     y_prob = clf.predict_proba(x_range)[:, 1]
     plt.plot(x_range, y_prob, color='red', linewidth=3, label='Learned Uncertainty Model (on SVOX)')
     
-    # 画出 SF-XS 的数据分布
+    # Plot SF-XS data distribution
     plt.scatter(X_test, y_test, color='gray', alpha=0.1, label='SF-XS Test Data')
     
     plt.title("Uncertainty Estimation: Trained on SVOX(Sun/Night) -> Tested on SF-XS")
@@ -127,7 +133,7 @@ def main():
     
     save_path = "final_uncertainty_plot.png"
     plt.savefig(save_path)
-    print(f"\n🖼️ 图表已保存为: {save_path}")
+    print(f"\n🖼️ Plot saved to: {save_path}")
     plt.show()
 
 if __name__ == "__main__":
