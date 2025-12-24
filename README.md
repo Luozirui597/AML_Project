@@ -57,3 +57,87 @@ CosPlace Data: logs/log_dir/2025-12-18_12-51-25
 NetVLAD Data: logs/log_dir/2025-12-19_12-27-49
 
 Next Step: Please integrate the table and the plot into the final report document.
+
+
+
+---
+
+## 🔍 Uncertainty Estimation (Section 6.2)
+
+This module implements a probabilistic uncertainty estimation mechanism for Visual Place Recognition. Instead of relying solely on the similarity score from the VPR model (e.g., CosPlace), we use **Geometric Verification** as a proxy for confidence.
+
+### 🛠 Methodology
+
+We treat the uncertainty estimation as a binary classification problem solvable via **Logistic Regression**:
+1.  **Retrieval:** The VPR model retrieves the top candidate.
+2.  **Matching:** We apply **SuperPoint + LightGlue** to match the query with the retrieved image.
+3.  **Feature:** The number of geometrically verified inliers is used as the input feature ($x$).
+4.  **Prediction:** A Logistic Regression model predicts the probability of correctness ($P(y=1|x)$).
+
+### 🧪 Experiment Design: Cross-Domain Robustness
+
+To ensure the robustness of our uncertainty estimator, we designed a challenging **Cross-Domain** experiment:
+
+* **Training Set (The "Teacher"):** **SVOX (Sun vs. Night)**
+    * We trained the model on a difficult split where queries are taken during the day and matched against a database at night.
+    * *Reasoning:* This forces the model to learn a conservative decision boundary, as even correct matches in extreme lighting changes yield fewer inliers.
+* **Testing Set (The "Student"):** **SF-XS (San Francisco)**
+    * The trained model was directly evaluated on the SF-XS dataset without fine-tuning.
+    * *Goal:* To validate the generalization capability of the estimator across different cities and environments.
+
+---
+
+## 🚀 Execution Flow: Uncertainty Estimation (Section 6.2)
+
+This section details the step-by-step pipeline to reproduce the Uncertainty Estimation results. The process involves generating raw VPR predictions, extracting geometric inliers via LightGlue, and training a Logistic Regression model for cross-domain evaluation.
+
+### 1. Generate Raw Predictions & Uncertainty Data
+First, run the VPR model (e.g., CosPlace) on both the **Training Set (SVOX Sun/Night)** and the **Test Set (SF-XS)**. The flag `--save_for_uncertainty` is crucial as it saves the ground truth labels and prediction indices.
+
+```bash
+# A. Generate Training Data (SVOX: Sun query vs Night database)
+python ./VPR-methods-evaluation/main.py \
+    --method cosplace \
+    --database_folder <path_to_svox_night> \
+    --queries_folder <path_to_svox_sun> \
+    --save_for_uncertainty --num_preds_to_save 2000 \
+    --log_dir ./logs/svox_train
+
+# B. Generate Test Data (SF-XS)
+python ./VPR-methods-evaluation/main.py \
+    --method cosplace \
+    --database_folder <path_to_sf_xs_db> \
+    --queries_folder <path_to_sf_xs_query> \
+    --save_for_uncertainty --num_preds_to_save 2000 \
+    --log_dir ./logs/sfxs_test
+```
+
+### 2. Extract Geometric Features (Inliers)
+Run the matching script to calculate the number of inliers for the retrieved candidates using SuperPoint + LightGlue. This converts raw images into quantitative "confidence scores" (inlier counts).
+
+```bash
+# Process SVOX Logs
+python match_queries_preds.py \
+    --preds-dir ./logs/svox_train/<timestamp>/preds \
+    --matcher superpoint-lg --num-preds 10
+
+# Process SF-XS Logs
+python match_queries_preds.py \
+    --preds-dir ./logs/sfxs_test/<timestamp>/preds \
+    --matcher superpoint-lg --num-preds 10
+```
+
+### 3. Train & Evaluate Logistic Regression
+Finally, run the analysis script. This script:
+
+1.Trains a Logistic Regression model on the SVOX inlier data.
+
+2.Evaluates the model on the SF-XS data (Cross-Domain Transfer).
+
+3.Visualizes the learned decision boundary (S-Curve).
+
+```bash
+# Ensure paths in universal_lr.py are set to the log folders generated above
+python universal_lr.py
+```
+
