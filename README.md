@@ -85,16 +85,59 @@ To ensure the robustness of our uncertainty estimator, we designed a challenging
     * The trained model was directly evaluated on the SF-XS dataset without fine-tuning.
     * *Goal:* To validate the generalization capability of the estimator across different cities and environments.
 
-### 📊 Results
+---
 
-Run the following script to reproduce the training and evaluation process:
+## 🚀 Execution Flow: Uncertainty Estimation (Section 6.2)
+
+This section details the step-by-step pipeline to reproduce the Uncertainty Estimation results. The process involves generating raw VPR predictions, extracting geometric inliers via LightGlue, and training a Logistic Regression model for cross-domain evaluation.
+
+### 1. Generate Raw Predictions & Uncertainty Data
+First, run the VPR model (e.g., CosPlace) on both the **Training Set (SVOX Sun/Night)** and the **Test Set (SF-XS)**. The flag `--save_for_uncertainty` is crucial as it saves the ground truth labels and prediction indices.
 
 ```bash
+# A. Generate Training Data (SVOX: Sun query vs Night database)
+python ./VPR-methods-evaluation/main.py \
+    --method cosplace \
+    --database_folder <path_to_svox_night> \
+    --queries_folder <path_to_svox_sun> \
+    --save_for_uncertainty --num_preds_to_save 2000 \
+    --log_dir ./logs/svox_train
+
+# B. Generate Test Data (SF-XS)
+python ./VPR-methods-evaluation/main.py \
+    --method cosplace \
+    --database_folder <path_to_sf_xs_db> \
+    --queries_folder <path_to_sf_xs_query> \
+    --save_for_uncertainty --num_preds_to_save 2000 \
+    --log_dir ./logs/sfxs_test
+```
+
+### 2. Extract Geometric Features (Inliers)
+Run the matching script to calculate the number of inliers for the retrieved candidates using SuperPoint + LightGlue. This converts raw images into quantitative "confidence scores" (inlier counts).
+
+```bash
+# Process SVOX Logs
+python match_queries_preds.py \
+    --preds-dir ./logs/svox_train/<timestamp>/preds \
+    --matcher superpoint-lg --num-preds 10
+
+# Process SF-XS Logs
+python match_queries_preds.py \
+    --preds-dir ./logs/sfxs_test/<timestamp>/preds \
+    --matcher superpoint-lg --num-preds 10
+```
+
+### 3. Train & Evaluate Logistic Regression
+Finally, run the analysis script. This script:
+
+1.Trains a Logistic Regression model on the SVOX inlier data.
+
+2.Evaluates the model on the SF-XS data (Cross-Domain Transfer).
+
+3.Visualizes the learned decision boundary (S-Curve).
+
+```bash
+# Ensure paths in universal_lr.py are set to the log folders generated above
 python universal_lr.py
 ```
 
-### Visualization: The resulting S-Curve (Sigmoid) demonstrates the relationship between inlier counts and confidence:
-
-### Observation: The learned curve shows a strong positive correlation between inlier counts and the probability of correctness.
-
-### Conservatism: Due to the challenging nature of the training set (Night), the model adopts a "conservative" confidence score (starting around 20%), effectively avoiding overconfidence in low-texture or difficult scenarios.
