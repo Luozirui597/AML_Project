@@ -127,17 +127,32 @@ python match_queries_preds.py \
     --matcher superpoint-lg --num-preds 10
 ```
 
-### 3. Train & Evaluate Logistic Regression
-Finally, run the analysis script. This script:
+### 3.Logistic Regression Model
 
-1.Trains a Logistic Regression model on the SVOX inlier data.
+This module implements the **Post-hoc Uncertainty Estimation** for Visual Place Recognition (VPR). It addresses the deterministic nature of VPR methods by learning a probabilistic mapping from **Geometric Inliers** to the **Probability of Correct Localization**.
 
-2.Evaluates the model on the SF-XS data (Cross-Domain Transfer).
+To ensure robustness, the model is trained in a **Cross-Domain** setting:
+* **Training (Teacher):** SVOX Night (Challenging illumination).
+* **Testing (Student):** SF-XS (Urban scenes) across multiple VPR backbones.
 
-3.Visualizes the learned decision boundary (S-Curve).
+### 📋 Features
+
+* **Logistic Regression Model:** Maps geometric consistency (inlier counts) to confidence scores.
+* **Cross-Domain Evaluation:** Validates generalization from difficult to easy domains.
+* **Multi-Method Support:** Batch testing for **CosPlace, NetVLAD, MixVPR, and MegaLoc**.
+* **Comprehensive Metrics:**
+    * **AUPRC:** Area Under Precision-Recall Curve (Robustness).
+    * **AUSE:** Area Under Sparsification Error (Calibration).
+    * **Spearman's $\rho$:** Rank Correlation.
+    * **$R^2$ Score:** Goodness of Fit.
+* **Automated Visualization:** Generates S-Curves, Sparsification Curves, and Comparison Bar Charts.
+
+### 🛠️ Prerequisites
+
+The script requires the following Python libraries:
 
 ```bash
-# Ensure paths in universal_lr.py are set to the log folders generated above
-python universal_lr.py
+pip install torch numpy matplotlib scikit-learn scipy
 ```
+
 
