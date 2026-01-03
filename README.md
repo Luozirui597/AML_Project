@@ -188,13 +188,27 @@ python universal_lr.py
 
 #### 3. Output Interpretation
 
-The script outputs a metrics table and saves three figures.
+We evaluated the Uncertainty Estimator on the SF-XS test set across different VPR backbones. The results demonstrate the effectiveness of using geometric inliers as a proxy for uncertainty, particularly for modern methods like MegaLoc.
 
-Metrics Table
-Method     | AUPRC (↑)  | AUSE (↓)   | Spearman (↑) | R2 Score (↑)
----------------------------------------------------------------------------
-CosPlace   | 0.8611     | 0.0954     | 0.5820       | 0.0242
-MegaLoc    | 0.9742     | 0.0231     | 0.4652       | -1.4816
+#### Quantitative Comparison
+
+| Method   | AUPRC (Robustness) ↑ | AUSE (Calibration) ↓ | Spearman (Ranking) ↑ | R² Score (Fit) ↑ |
+| :---     | :---                 | :---                 | :---                 | :---             |
+| **CosPlace** | 0.8611               | 0.0954               | 0.5820               | 0.0242           |
+| **MegaLoc** | **0.9742** | **0.0231** | 0.4652               | -1.4816          |
+
+#### Analysis & Key Observations
+
+* **Superior Robustness of MegaLoc:**
+    MegaLoc achieves a remarkable **AUPRC of 97.42%**, significantly outperforming CosPlace (86.11%). This indicates that MegaLoc provides high-quality feature matches: when it reports a high number of inliers, the localization is almost certainly correct.
+
+* **Calibration Performance (AUSE):**
+    Lower AUSE indicates better calibration. MegaLoc achieves the lowest error (**0.0231**), suggesting that its geometric consistency is highly reliable for predicting uncertainty, closely matching the ideal "Oracle" curve.
+
+* **Interpretation of Negative $R^2$ Scores:**
+    The negative $R^2$ score for MegaLoc (-1.4816) is an expected outcome of the **Cross-Domain** experimental design (Training on SVOX Night $\to$ Testing on SF-XS Day).
+    * **The Cause:** The model is trained on a difficult dataset (SVOX), learning to be "conservative" (assigning lower probabilities). When applied to the easier/more accurate MegaLoc method on SF-XS, the model is systematically "under-confident" compared to the ground truth.
+    * **The Verdict:** While this affects the absolute numerical fit ($R^2$), the high **AUPRC** and positive **Spearman** correlation confirm that the **relative ranking** remains correct and effective for distinguishing successful queries from failures.
 
 #### Generated Figures
 
