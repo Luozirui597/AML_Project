@@ -71,7 +71,9 @@ def compute_sue(matched_array_for_aucpr, preds, ref_poses, dists, num_NN=10, slo
         sue_scores[itr] = (variance_lat_lat + variance_lon_lon)/2  # assuming independent dimensions
 
     sue_scores = -1 * sue_scores # converting into a confidence instead of an uncertainty
-    sue_scores_normalized = np.interp(sue_scores, (sue_scores.min(), sue_scores.max()), (0.0, 0.9999)) # avoiding infinity
+    sue_scores = np.nan_to_num(sue_scores, nan=0.0)
+    sue_scores_normalized = np.interp(sue_scores, (sue_scores.min(), sue_scores.max()), (0.0, 0.9999))
+    sue_scores_normalized = np.nan_to_num(sue_scores_normalized, nan=0.0)
 
     precision_based_on_suescore, recall_based_on_suescore, _ = precision_recall_curve(matched_array_for_aucpr, sue_scores_normalized)
     return auc(recall_based_on_suescore, precision_based_on_suescore)

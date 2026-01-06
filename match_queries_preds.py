@@ -10,6 +10,9 @@ from copy import deepcopy
 
 from util import read_file_preds
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 sys.path.append(str(Path(__file__).parent.joinpath("image-matching-models")))
 
 from matching import get_matcher, available_models

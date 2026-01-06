@@ -56,8 +56,9 @@ class NetVLAD(torch.nn.Module):
         if not checkpoint.exists():
             checkpoint.parent.mkdir(exist_ok=True, parents=True)
             link = dir_models[model_name]
-            cmd = ["wget", link, "-O", str(checkpoint)]
-            subprocess.run(cmd, check=True)
+            #cmd = ["wget", link, "-O", str(checkpoint)]
+            #subprocess.run(cmd, check=True)
+            torch.hub.download_url_to_file(link, str(checkpoint))
 
         # Create the network.
         # Remove classification head.

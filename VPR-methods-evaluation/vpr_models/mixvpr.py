@@ -90,9 +90,30 @@ class MixVPR(nn.Module):
         x = F.normalize(x.flatten(1), p=2, dim=-1)
         return x
 
-### Implement ResNet-50 here for MixVPR model,
-### otherwise `self.backbone = ResNet()` will fail
-### (academic purpose)
+class ResNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Load standard ResNet50
+        self.model = torchvision.models.resnet50(weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V2)
+        
+        # FIX: The checkpoint lacks layer4 and fc, so we must remove them 
+        # from our model definition to match the file.
+        del self.model.layer4
+        del self.model.fc
+        del self.model.avgpool
+
+    def forward(self, x):
+        x = self.model.conv1(x)
+        x = self.model.bn1(x)
+        x = self.model.relu(x)
+        x = self.model.maxpool(x)
+
+        x = self.model.layer1(x)
+        x = self.model.layer2(x)
+        x = self.model.layer3(x)
+        
+        # Do not call layer4, as it was removed
+        return x
 
 
 class MixVPRModel(torch.nn.Module):
