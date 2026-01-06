@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore')
 
 # 1. Training Set (Teacher) -> SVOX (Sun vs Night)
 TRAIN_LOG_DIR = r"D:\AML\Visual-Place-Recognition-Project\logs\2025-12-23_21-01-31"
-TRAIN_DATASET_NAME = "SVOX (Night)"
+TRAIN_DATASET_NAME = "SVOX (Sun vs Night)"
 
 # 2. Test Sets (Student) -> SF-XS
 # The keys will be used as labels in the plots
