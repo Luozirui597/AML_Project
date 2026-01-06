@@ -110,20 +110,13 @@ python VPR-methods-evaluation/main.py \
 ```
 
 **Step 1.2: Run Feature Matching**
-Run matching to calculate inliers. To satisfy course requirements, we compare two matchers:
+Run matching to calculate inliers. To satisfy course requirements, we compare 4 matchers, for example:
 
 * **Option A: SuperPoint + LightGlue (Sparse)**
     ```bash
     python match_queries_preds.py ^
         --preds-dir "logs/megaloc_sfxs_test/<TIMESTAMP>/preds" ^
         --matcher superpoint-lg --num-preds 20
-    ```
-
-* **Option B: LoFTR (Dense)**
-    ```bash
-    python match_queries_preds.py ^
-        --preds-dir "logs/megaloc_sfxs_test/<TIMESTAMP>/preds" ^
-        --matcher loftr --num-preds 20
     ```
 
 ### Phase 2: Qualitative Analysis (Plots)
