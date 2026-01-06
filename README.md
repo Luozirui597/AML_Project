@@ -138,10 +138,10 @@ Run matching to calculate inliers. To satisfy course requirements, we compare 4 
 **Goal:** Compare our **Geometric Uncertainty (Inliers)** against baselines (L2, PA-Score, SUE).
 
 ```bash
-python vpr_uncertainty/eval.py ^
-  --preds-dir "logs/megaloc_sfxs_test/<TIMESTAMP>/preds" ^
-  --inliers-dir "logs/megaloc_sfxs_test/<TIMESTAMP>/preds_superpoint-lg" ^
-  --z-data-path "logs/megaloc_sfxs_test/<TIMESTAMP>/z_data.torch"
+python -m vpr_uncertainty.eval \
+	--preds-dir '<path-to-predictions-folder>' \
+	--inliers-dir '<path-to-inliers-folder>' \
+	--z-data-path '<path-to-z-data-file>'
 ```
 **Expected Output Like:**
 ```text
