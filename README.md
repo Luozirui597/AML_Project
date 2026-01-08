@@ -26,11 +26,10 @@ This project relies on `image-matching-models` and `imatch-toolbox`. Follow thes
 
 ```bash
 # 1. Update the main submodule
-git submodule update --init
+git submodule update --init --recursive
 
-# 2. Update nested submodules
+# 2. Apply SuperGlue Fix
 cd image-matching-models
-git submodule update --init matching/third_party/LightGlue
 git submodule update --init matching/third_party/imatch-toolbox
 
 # 3. Apply SuperGlue Fix
@@ -192,6 +191,15 @@ Results from `universal_lr.py` evaluating the uncertainty module on **SF-XS** (T
 | **NetVLAD** | 0.7339               | 0.1319               | **0.6015** | **0.2217** |
 | **MixVPR** | 0.8980               | 0.0755               | 0.5674               | -0.1384          |
 | **MegaLoc** | **0.9742** | **0.0231** | 0.4652               | -1.4816* |
+
+Results from `universal_lr.py` evaluating the uncertainty module on **TOKYO-XS** (Trained on SVOX (Sun vs Night)):
+
+| Method       | AUPRC (Robustness) ↑ | AUSE (Calibration) ↓ | Spearman (Ranking) ↑ | R² Score (Fit) ↑ |
+| :---         | :---                 | :---                 | :---                 | :---             |
+| **CosPlace** | 0.8583               | 0.1017               | 0.5158               | -0.1749          |
+| **NetVLAD**  | 0.9213               | 0.0453               | **0.7334**               | **0.1148**           |
+| **MixVPR**   | 0.9303               | 0.0560               | 0.4818               | -0.6831          |
+| **MegaLoc**  | 0.**9950**               | **0.0047**               | 0.2900               | -7.4204*         |
 
 *\*Note: The negative R² score for MegaLoc is due to the domain shift between training (Night) and testing (Day). While the model is conservative (under-estimating probabilities), it maintains excellent ranking performance (High AUPRC), effectively distinguishing correct matches from incorrect ones.*
 
