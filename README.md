@@ -212,3 +212,4 @@ Results from `universal_lr.py` evaluating the uncertainty module on **TOKYO-XS**
 * `vpr_uncertainty/`: Package containing baseline evaluation logic (`eval.py`).
 * `match_queries_preds.py`: Script for feature matching (SuperPoint, LoFTR).
 * `logs/`: Directory storing experiment results.
+* `results/`:Results images.
