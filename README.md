@@ -185,7 +185,7 @@ Full comparison of all VPR methods with different matchers on the **Tokyo** data
 ### 4.2 SF-XS Dataset Benchmark
 Full comparison of all VPR methods with different matchers on the **SF-XS** dataset (Resolution: 512x512, Slope: 58, topK: 20):
 
-| Dataset | Method | Backbone | Dim | Matcher | R@1 | R@5 | R@10 | R@20 | AUPRC | AURCpa | AURCsue | AURCrand | AURCinl |
+| Dataset | Method | Backbone | Dim | Matcher | R@1 | R@5 | R@10 | R@20 | L2-distance | AURCpa | AURCsue | AURCrand | AURCinl |
 |:---| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **sf_xs** | **CosPlace** | ResNet18 | 512 | superpoint-lg | 77.5 | 79.9 | 80.5 | 81.3 | 89.3 | 85.2 | 94.3 | 60.4 | 98.1 |
 | | | | | loftr | 77.4 | 79.8 | 80.4 | 81.3 | 89.3 | 85.2 | 96.3 | 60.4 | 97.8 |
