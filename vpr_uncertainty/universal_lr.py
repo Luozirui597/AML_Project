@@ -199,8 +199,8 @@ def main():
                     color='#3498db', alpha=0.3, s=20, 
                     label=f"Samples ({best_method_data['name']} on {TEST_DATASET_NAME})")
     
-    plt.title('Fig 1. Logistic Regression Uncertainty Model', fontsize=14, fontweight='bold')
-    plt.suptitle(f"Training: {TRAIN_DATASET_NAME} | Test: {TEST_DATASET_NAME} | Matcher: {MATCHER_DISPLAY_NAME}", fontsize=10, y=0.92)
+    plt.title('Fig 1. Logistic Regression Uncertainty Model', fontsize=14, fontweight='bold', pad=20)
+    plt.suptitle(f"Training: {TRAIN_DATASET_NAME} | Test: {TEST_DATASET_NAME} | Matcher: {MATCHER_DISPLAY_NAME}", fontsize=10, y=0.9)
     plt.xlabel('Number of Inliers', fontsize=12)
     plt.ylabel('Probability of Correctness', fontsize=12)
     plt.legend(loc='lower right', frameon=True, facecolor='white', framealpha=0.9)
@@ -211,86 +211,86 @@ def main():
     plt.savefig(save_path1, dpi=300)
     print(f"✅ Fig 1 Saved: {save_path1}")
 
-    # --- Fig 2: Sparsification Curve (Showing AUSE) ---
-    plt.figure(figsize=(9, 7))
-    if best_method_data:
-        mc = best_method_data['model_curve']
-        oc = best_method_data['oracle_curve']
-        x_axis = np.linspace(0, 1, len(mc))
+    # # --- Fig 2: Sparsification Curve (Showing AUSE) ---
+    # plt.figure(figsize=(9, 7))
+    # if best_method_data:
+    #     mc = best_method_data['model_curve']
+    #     oc = best_method_data['oracle_curve']
+    #     x_axis = np.linspace(0, 1, len(mc))
         
-        plt.plot(x_axis, mc, label='Model Error Curve', color='#3498db', linewidth=2)
-        plt.plot(x_axis, oc, label='Oracle (Ideal) Curve', color='#2ecc71', linestyle='--', linewidth=2)
-        plt.fill_between(x_axis, mc, oc, color='gray', alpha=0.2, label=f'AUSE = {best_ause:.4f}')
+    #     plt.plot(x_axis, mc, label='Model Error Curve', color='#3498db', linewidth=2)
+    #     plt.plot(x_axis, oc, label='Oracle (Ideal) Curve', color='#2ecc71', linestyle='--', linewidth=2)
+    #     plt.fill_between(x_axis, mc, oc, color='gray', alpha=0.2, label=f'AUSE = {best_ause:.4f}')
         
-        plt.title(f"Fig 2. Sparsification Curve", fontsize=14, fontweight='bold')
-        plt.suptitle(f"Method: {best_method_data['name']} | Dataset: {TEST_DATASET_NAME} | Matcher: {MATCHER_DISPLAY_NAME}", fontsize=10, y=0.92)
-        plt.xlabel('Fraction of Removed Samples', fontsize=12)
-        plt.ylabel('Error Rate', fontsize=12)
-        plt.legend(frameon=True, facecolor='white', framealpha=0.9)
-        plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    save_path2 = os.path.join(RESULTS_DIR, 'Fig2_Sparsification_Curve.png')
-    plt.savefig(save_path2, dpi=300)
-    print(f"✅ Fig 2 Saved: {save_path2}")
+    #     plt.title(f"Fig 2. Sparsification Curve", fontsize=14, fontweight='bold')
+    #     plt.suptitle(f"Method: {best_method_data['name']} | Dataset: {TEST_DATASET_NAME} | Matcher: {MATCHER_DISPLAY_NAME}", fontsize=10, y=0.92)
+    #     plt.xlabel('Fraction of Removed Samples', fontsize=12)
+    #     plt.ylabel('Error Rate', fontsize=12)
+    #     plt.legend(frameon=True, facecolor='white', framealpha=0.9)
+    #     plt.grid(True, alpha=0.3)
+    # plt.tight_layout()
+    # save_path2 = os.path.join(RESULTS_DIR, 'Fig2_Sparsification_Curve.png')
+    # plt.savefig(save_path2, dpi=300)
+    # print(f"✅ Fig 2 Saved: {save_path2}")
 
-    # --- Fig 3: Comprehensive Bar Charts (2x2 Grid) ---
-    fig, axs = plt.subplots(2, 2, figsize=(16, 12))
-    ax1, ax2, ax3, ax4 = axs.ravel()
+    # # --- Fig 3: Comprehensive Bar Charts (2x2 Grid) ---
+    # fig, axs = plt.subplots(2, 2, figsize=(16, 12))
+    # ax1, ax2, ax3, ax4 = axs.ravel()
 
-    # Define color palette
-    colors = ['#95a5a6', '#3498db', '#9b59b6', '#2ecc71']
+    # # Define color palette
+    # colors = ['#95a5a6', '#3498db', '#9b59b6', '#2ecc71']
 
-    # 1. AUPRC (Robustness)
-    bars1 = ax1.bar(stats['names'], stats['auprc'], color=colors, alpha=0.9)
-    ax1.set_title('Robustness (AUPRC ↑)', fontsize=14, fontweight='bold')
-    ax1.set_ylim(0, 1.15)
-    ax1.grid(axis='y', alpha=0.3)
-    for bar in bars1:
-        ax1.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.01,
-                 f'{bar.get_height():.1%}', ha='center', fontweight='bold', fontsize=10)
+    # # 1. AUPRC (Robustness)
+    # bars1 = ax1.bar(stats['names'], stats['auprc'], color=colors, alpha=0.9)
+    # ax1.set_title('Robustness (AUPRC ↑)', fontsize=14, fontweight='bold')
+    # ax1.set_ylim(0, 1.15)
+    # ax1.grid(axis='y', alpha=0.3)
+    # for bar in bars1:
+    #     ax1.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.01,
+    #              f'{bar.get_height():.1%}', ha='center', fontweight='bold', fontsize=10)
 
-    # 2. AUSE (Reliability)
-    bars2 = ax2.bar(stats['names'], stats['ause'], color=colors, alpha=0.9)
-    ax2.set_title('Reliability Error (AUSE ↓)', fontsize=14, fontweight='bold')
-    max_ause = max(stats['ause']) if stats['ause'] else 1.0
-    ax2.set_ylim(0, max_ause * 1.3)
-    ax2.grid(axis='y', alpha=0.3)
-    for bar in bars2:
-        ax2.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.002,
-                 f'{bar.get_height():.4f}', ha='center', fontweight='bold', fontsize=10)
+    # # 2. AUSE (Reliability)
+    # bars2 = ax2.bar(stats['names'], stats['ause'], color=colors, alpha=0.9)
+    # ax2.set_title('Reliability Error (AUSE ↓)', fontsize=14, fontweight='bold')
+    # max_ause = max(stats['ause']) if stats['ause'] else 1.0
+    # ax2.set_ylim(0, max_ause * 1.3)
+    # ax2.grid(axis='y', alpha=0.3)
+    # for bar in bars2:
+    #     ax2.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.002,
+    #              f'{bar.get_height():.4f}', ha='center', fontweight='bold', fontsize=10)
 
-    # 3. Spearman (Rank Correlation)
-    bars3 = ax3.bar(stats['names'], stats['spearman'], color=colors, alpha=0.9)
-    ax3.set_title('Rank Correlation (Spearman ↑)', fontsize=14, fontweight='bold')
-    ax3.set_ylim(0, 1.1)
-    ax3.grid(axis='y', alpha=0.3)
-    for bar in bars3:
-        ax3.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.01,
-                 f'{bar.get_height():.3f}', ha='center', fontweight='bold', fontsize=10)
+    # # 3. Spearman (Rank Correlation)
+    # bars3 = ax3.bar(stats['names'], stats['spearman'], color=colors, alpha=0.9)
+    # ax3.set_title('Rank Correlation (Spearman ↑)', fontsize=14, fontweight='bold')
+    # ax3.set_ylim(0, 1.1)
+    # ax3.grid(axis='y', alpha=0.3)
+    # for bar in bars3:
+    #     ax3.text(bar.get_x() + bar.get_width()/2., bar.get_height() + 0.01,
+    #              f'{bar.get_height():.3f}', ha='center', fontweight='bold', fontsize=10)
 
-    # 4. R2 Score (Goodness of Fit)
-    bars4 = ax4.bar(stats['names'], stats['r2'], color=colors, alpha=0.9)
-    ax4.set_title('Goodness of Fit (R² Score ↑)', fontsize=14, fontweight='bold')
-    # R2 can be negative, so we adjust limits dynamically
-    min_r2 = min(stats['r2']) if stats['r2'] else 0
-    max_r2 = max(stats['r2']) if stats['r2'] else 1
-    # Add some padding
-    y_range = max_r2 - min_r2
-    ax4.set_ylim(min_r2 - y_range*0.1, max_r2 + y_range*0.2 if y_range > 0 else 1)
-    ax4.grid(axis='y', alpha=0.3)
-    ax4.axhline(0, color='black', linewidth=0.8, linestyle='--') # Add zero line for R2
-    for bar in bars4:
-        # Position text slightly above or below bar depending on value
-        y_pos = bar.get_height() + (y_range*0.02 if bar.get_height() >= 0 else -y_range*0.05)
-        ax4.text(bar.get_x() + bar.get_width()/2., y_pos,
-                 f'{bar.get_height():.3f}', ha='center', fontweight='bold', fontsize=10)
+    # # 4. R2 Score (Goodness of Fit)
+    # bars4 = ax4.bar(stats['names'], stats['r2'], color=colors, alpha=0.9)
+    # ax4.set_title('Goodness of Fit (R² Score ↑)', fontsize=14, fontweight='bold')
+    # # R2 can be negative, so we adjust limits dynamically
+    # min_r2 = min(stats['r2']) if stats['r2'] else 0
+    # max_r2 = max(stats['r2']) if stats['r2'] else 1
+    # # Add some padding
+    # y_range = max_r2 - min_r2
+    # ax4.set_ylim(min_r2 - y_range*0.1, max_r2 + y_range*0.2 if y_range > 0 else 1)
+    # ax4.grid(axis='y', alpha=0.3)
+    # ax4.axhline(0, color='black', linewidth=0.8, linestyle='--') # Add zero line for R2
+    # for bar in bars4:
+    #     # Position text slightly above or below bar depending on value
+    #     y_pos = bar.get_height() + (y_range*0.02 if bar.get_height() >= 0 else -y_range*0.05)
+    #     ax4.text(bar.get_x() + bar.get_width()/2., y_pos,
+    #              f'{bar.get_height():.3f}', ha='center', fontweight='bold', fontsize=10)
 
-    plt.suptitle(f'Fig 3. Comprehensive Metric Comparison\nDataset: {TEST_DATASET_NAME} | Matcher: {MATCHER_DISPLAY_NAME}', fontsize=16, y=0.98)
-    plt.tight_layout()
+    # plt.suptitle(f'Fig 3. Comprehensive Metric Comparison\nDataset: {TEST_DATASET_NAME} | Matcher: {MATCHER_DISPLAY_NAME}', fontsize=16, y=0.98)
+    # plt.tight_layout()
     
-    save_path3 = os.path.join(RESULTS_DIR, 'Fig3_Comprehensive_Chart.png')
-    plt.savefig(save_path3, dpi=300)
-    print(f"✅ Fig 3 Saved: {save_path3}")
+    # save_path3 = os.path.join(RESULTS_DIR, 'Fig3_Comprehensive_Chart.png')
+    # plt.savefig(save_path3, dpi=300)
+    # print(f"✅ Fig 3 Saved: {save_path3}")
     
     plt.show()
 
