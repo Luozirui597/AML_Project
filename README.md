@@ -200,7 +200,7 @@ Full comparison of all VPR methods with different matchers on the **SF-XS** data
 | | | | | loftr | 86.8 | 89.6 | 90.8 | 91.5 | 99.1 | 96.7 | 99.4 | 86.3 | 98.9 |
 | | | | | superglue | 86.0 | 90.4 | 91.2 | 91.5 | 99.1 | 96.7 | 99.4 | 86.3 | 98.9 |
 
-### 4.3 Uncertainty Estimation Analysis (SF-XS)
+### 4.3 Uncertainty Estimation Analysis
 Results from `universal_lr.py` evaluating the uncertainty module on **SF-XS** (Trained on SVOX (Sun vs Night)):
 
 | Method       | AUPRC (Robustness) ↑ | AUSE (Calibration) ↓ | Spearman (Ranking) ↑ | R² Score (Fit) ↑ |
