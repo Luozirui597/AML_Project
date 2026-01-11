@@ -182,7 +182,25 @@ Full comparison of all VPR methods with different matchers on the **Tokyo** data
 | | | | | loftr | 89.8 | 91.7 | 92.7 | 93.3 | 97.3 | 94.9 | 88.4 | 75.2 | 99.6 |
 | | | | | superglue | 87.0 | 91.1 | 92.4 | 93.3 | 97.3 | 94.9 | 88.4 | 75.2 | 99.4 |
 
-### 4.2 Uncertainty Estimation Analysis (SF-XS)
+### 4.2 SF-XS Dataset Benchmark
+Full comparison of all VPR methods with different matchers on the **SF-XS** dataset (Resolution: 512x512, Slope: 58, topK: 20):
+
+| Dataset | Method | Backbone | Dim | Matcher | R@1 | R@5 | R@10 | R@20 | AUPRC | AURCpa | AURCsue | AURCrand | AURCinl |
+|:---| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **sf_xs** | **CosPlace** | ResNet18 | 512 | superpoint-lg | 77.5 | 79.9 | 80.5 | 81.3 | 89.3 | 85.2 | 94.3 | 60.4 | 98.1 |
+| | | | | loftr | 77.4 | 79.8 | 80.4 | 81.3 | 89.3 | 85.2 | 96.3 | 60.4 | 97.8 |
+| | | | | superglue | 76.7 | 79.8 | 80.6 | 81.3 | 89.3 | 85.2 | 94.3 | 60.4 | 97.2 |
+| **sf_xs** | **NetVLAD** | VGG16 | 4096 | superpoint-lg | 62.5 | 64.6 | 64.9 | 65.2 | 75.5 | 69.6 | 79.8 | 42.1 | 98.8 |
+| | | | | loftr | 61.4 | 63.8 | 64.4 | 65.2 | 75.5 | 69.6 | 79.8 | 42.1 | 97.8 |
+| | | | | superglue | 60.8 | 64.1 | 64.6 | 65.2 | 75.5 | 69.6 | 79.8 | 42.1 | 97.6 |
+| **sf_xs** | **MixVPR** | ResNet50 | 512 | superpoint-lg | 80.7 | 82.5 | 83.3 | 83.6 | 94.0 | 90.1 | 96.6 | 67.3 | 98.6 |
+| | | | | loftr | 79.5 | 82.5 | 83.4 | 83.6 | 94.0 | 90.1 | 96.6 | 67.3 | 98.2 |
+| | | | | superglue | 79.2 | 82.4 | 83.2 | 83.6 | 94.0 | 90.1 | 96.6 | 67.3 | 97.5 |
+| **sf_xs** | **MegaLoc** | Dinov2 | 8448 | superpoint-lg | 87.2 | 90.8 | 91.4 | 91.5 | 99.1 | 96.7 | 99.4 | 86.3 | 99.0 |
+| | | | | loftr | 86.8 | 89.6 | 90.8 | 91.5 | 99.1 | 96.7 | 99.4 | 86.3 | 98.9 |
+| | | | | superglue | 86.0 | 90.4 | 91.2 | 91.5 | 99.1 | 96.7 | 99.4 | 86.3 | 98.9 |
+
+### 4.3 Uncertainty Estimation Analysis (SF-XS)
 Results from `universal_lr.py` evaluating the uncertainty module on **SF-XS** (Trained on SVOX (Sun vs Night)):
 
 | Method       | AUPRC (Robustness) ↑ | AUSE (Calibration) ↓ | Spearman (Ranking) ↑ | R² Score (Fit) ↑ |
