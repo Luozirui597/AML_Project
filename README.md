@@ -128,7 +128,7 @@ Run matching to calculate inliers. To satisfy course requirements, we compare 4 
 3.  Set `MATCHER_FOLDER = "preds_superpoint-lg"` (or `"preds_loftr"`).
 4.  Run:
     ```bash
-    python universal_lr.py
+    python ../vpr_uncertainty/universal_lr.py
     ```
 5.  **Output:** Figures will be saved in the ../Visual-Place-Recognition-Project/results.
 
